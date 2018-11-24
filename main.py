@@ -7,17 +7,14 @@ from igrill import IGrillHandler
 from tokencube import TokenCubeHandler
 
 device_settings = {
-    "d4:81:ca:03:ab:80": {
+    "70:91:8f:01:f7:30": {
         "device": "iGrill Mini",
-        "addr": "d4:81:ca:03:ab:80",
-        "type": "kitchen"
+        "addr": "70:91:8f:01:f7:30",
+        "type": "red probe"
     },
-    "dc:00:62:95:62:67": {
-        "device": "TokenCube 1",
-        "addr": "dc:00:62:95:62:67",
-        "type": "ambient"
-    }
 }
+
+CLOUD_URL = ""
 
 INFLUX_SERVER = os.environ.get("INFLUX_SERVER", None) or "raspberrypi.local"
 INFLUX_DATABASE = os.environ.get("INFLUX_DB", None) or "sensors"
@@ -28,7 +25,6 @@ if __name__ == "__main__":
     print "Creating Scanner"
     delegate = DeviceForwardingDelegate()
     delegate.handlers.append(IGrillHandler(device_settings))
-    delegate.handlers.append(TokenCubeHandler(device_settings))
 
     scanner = Scanner()
     scanner.withDelegate(delegate)
@@ -37,9 +33,13 @@ if __name__ == "__main__":
     persistence = DataPersistence(INFLUX_SERVER, INFLUX_DATABASE, INFLUX_USER, INFLUX_PASSWORD)
 
     while True:
-        print "Scanning..."
-        scanner.scan(30)
+        try:
+            print "Scanning..."
+            scanner.scan(15)
 
-        print "Persisting..."
-        for handler in delegate.handlers:
-            handler.persist_stats(persistence)
+            print "Persisting..."
+            for handler in delegate.handlers:
+                handler.persist_stats(persistence)
+        except Exception as ex:
+            print "exception: ", ex
+

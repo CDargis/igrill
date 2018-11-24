@@ -45,12 +45,12 @@ class IGrillHandler(object):
 
     def persist_stats(self, persistence):
         for dev in list(self.devices):
-            settings = self.device_settings.get(dev.deviceAddr)
+            settings = self.device_settings.get(dev.addr)
             print "dev: ", dev, ", settings: ", settings
             if settings == None:
                 settings = {
-                    "device": "iGrill " + dev.deviceAddr,
-                    "type": "kitchen",
+                    "device": "iGrill " + dev.addr,
+                    "type": "unknown",
                     "addr": dev.addr,
                 }
 
@@ -59,7 +59,7 @@ class IGrillHandler(object):
                 temp = dev.read_temperature()
                 battery = dev.read_battery()
             except Exception as ex:
-                print "Error reading from ", dev.deviceAddr, ": ", ex, "removing device"
+                print "Error reading from ", dev.addr, ": ", ex, "removing device"
                 self.devices.remove(dev)
                 continue
 
